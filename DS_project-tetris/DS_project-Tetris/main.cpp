@@ -137,14 +137,22 @@ void updatemap(gameboard board,block test){
 //    vector <int> lastline(test.shape[3].begin(), test.shape[3].end()-1);
 //    lastline.assign(test.shape[3].begin(), test.shape[3].end()-1);   //fuck why exceed boundary
     int i=0;     // cube's current position(height) in the gameboard
-    while(i<board.height){
+    bool obstruct=false;
+    while(i<board.height && obstruct==false){
         int j=0;        //count each dot in the test
         int falling_col=test.reference-1;
-        for(auto dot=test.shape[3].begin();dot!=test.shape[3].end();dot++){
-            if( *dot==1 && board.map[j][falling_col]==1){
-                //wwww
+        obstruct=false;
+        for(auto dot=test.shape[3].begin();dot!=test.shape[3].end();dot++,j++){
+            
+            if( *dot==1 ){  // check the dot downward
+                if(board.map[i][falling_col+j]==1){
+                    obstruct=true;
+                }
             }
-        
+            
+        }
+        if( obstruct==true && test.move!=0){   //to move left or right
+            
         }
         i++;
     }
