@@ -10,6 +10,7 @@
 #include <string>
 #include <algorithm>
 #include <vector>
+#include <fstream>
 
 using namespace std;
 
@@ -106,6 +107,7 @@ public:
         cube[cubecnt]= block(st,r,m);
         cubecnt++;
     }
+    bool check();
     gameboard(int w,int h){
         width=w;
         height=h;
@@ -151,9 +153,22 @@ bool checkboundary(block test,int fallingpt){
     return velidity;
 }
 void gameboard::cleanboard(){
-    for(int i=0;i<this->width;i++){
-        for(int j=0;j<this->height;j++){
-            
+    int w=this->width-1;
+    int h=this->height-1;
+    for(int i=h;i>=0;i--){
+        int j=0;
+        for(j=0;j<=w;j++){
+            if(map[i][j]!=1) break;
+        }
+        if(j==w+1){
+            for(int k=i;k>0;k--){
+                for(int m=0;m<=w;m++){
+                    map[k][m]=map[k-1][m];
+                }
+            }
+            for(int i=0;i<=w;i++){
+                map[0][i]=0;
+            }
         }
     }
 }
@@ -164,6 +179,20 @@ void write_in(int falcol,block test,gameboard &b ,int bottom ){
             if(test.shape[3-i][j]==1) b.map[bottom-i][j+falcol]=1;
         }
     }
+}
+bool gameboard::check(){
+    bool todelete=false;
+    for(int i=0;i<this->height;i++){
+        int j=0;
+        for(j=0;j<this->width;j++){
+            if(this->map[i][j]!=1) break;
+        }
+        if(j==this->width){
+            todelete=true;
+            break;
+        }
+    }
+    return todelete;
 }
 int updatemap( gameboard &board, block test, int i, bool move ){
    
@@ -201,13 +230,16 @@ int updatemap( gameboard &board, block test, int i, bool move ){
    
 
     if( move==true ){
-       // cout<<test.name<<endl;
-       // cout<<i<<endl;
+      
         write_in(falling_col,test,board,i+2);
     }
     return i;
 }
 int main(int argc, const char * argv[]) {
+   /* fstream file;
+    file.open("1.data" ,ios::in);
+    if(!file) cout<<"fuck no file"<<endl;*/
+    
     int n,m;
     int refer,mo;
     string str;
@@ -225,8 +257,11 @@ int main(int argc, const char * argv[]) {
         if( board.cube[i].move == 0 ) updatemap(board, board.cube[i], -3  , true);
         if(board.cube[i].move!=0){
             int tmp=updatemap(board, board.cube[i],-3, false);
-            //cout<<board.cube[i].name<<tmp<<endl;
             updatemap(board, board.cube[i], tmp  , true);
+        }
+        //cout<<board.check()<<endl;
+        while(board.check()){
+            board.cleanboard();
         }
     }
     board.showmap();
