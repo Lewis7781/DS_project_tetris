@@ -101,6 +101,7 @@ public:
     block cube[1000];
     vector<vector<int>>  map;   //  <=15*40
     
+    void cleanboard();
     void addcube(string st,int r,int m){
         cube[cubecnt]= block(st,r,m);
         cubecnt++;
@@ -149,55 +150,62 @@ bool checkboundary(block test,int fallingpt){
     
     return velidity;
 }
-void write_in(int falcol,block test,gameboard &b ){
-    falcol+=test.move;
-    for(int m=3;m>=0;m--){
-        for(int n=0;n<4;n++){
-            if(test.shape[m][n]==1){
-               // cout<<"NN"<<endl;
-                b.map[b.height-4+m][n+falcol]=1;
-            }
+void gameboard::cleanboard(){
+    for(int i=0;i<this->width;i++){
+        for(int j=0;j<this->height;j++){
+            
         }
     }
 }
-void updatemap(gameboard &board,block test){
+void write_in(int falcol,block test,gameboard &b ,int bottom ){
    
-    int i=-3;     // cube's top node current position(height) in the gameboard
+    for(int i=0;i<4;i++){
+        for(int j=0;j<4;j++){
+            if(test.shape[3-i][j]==1) b.map[bottom-i][j+falcol]=1;
+        }
+    }
+}
+int updatemap( gameboard &board, block test, int i, bool move ){
+   
+        // cube's top node current position(height) in the gameboard
     bool obstruct=false;
     int falling_col=test.reference-1;
-    //showcube(test);
+    if( move ==true ) falling_col+=test.move ;
     
-    while ( i+4<board.height && obstruct==false ) {
+    while ( i+4<=board.height && obstruct==false ) {
         
-                //count each dot in the test
+        //cout<<i<<endl;
         obstruct=false;
         for( int k=3;k>=0;k-- ){                        //check the postion of the cube from below
             int j=0;
             for(auto dot=test.shape[k].begin();dot!=test.shape[k].end();dot++,j++){
                 //cout<<*dot<<" ";
                 if( i+k <0 ) break;
-                if( *dot==1 ){                   // check the dot from downward
+                if( *dot==1 ){                          // check the dot from downward
                     if(board.map[i+k][falling_col+j]==1){
-                        cout<<"catchu"<<endl;
-                        cout<<i<<" "<<k<<" "<<j<<endl;
+                        //cout<<test.name <<"="<<i+3<<endl;
                         obstruct=true;
-                        break;
                     }
                 }
                 
             }
-            if( obstruct==true ){       // find obstruction during checking
-                //cout<<"i="<<i<<endl;
-                
+            if( obstruct==true ){                       // find obstruction during checking
+              //  cout<<i<<endl;
+                if(move == true)
+                write_in(falling_col,test,board,i+2);     //怪怪的
+                return i;
             }
         }
         i++;
     }
-    //cout<<"Ob"<<obstruct<<endl;
-    if( obstruct==false ){      //touch bottom without obstruction
-        write_in(falling_col,test,board);
+   
+
+    if( move==true ){
+       // cout<<test.name<<endl;
+       // cout<<i<<endl;
+        write_in(falling_col,test,board,i+2);
     }
-    
+    return i;
 }
 int main(int argc, const char * argv[]) {
     int n,m;
@@ -213,7 +221,14 @@ int main(int argc, const char * argv[]) {
    // showcube(board);
     
     //for(auto testcase:board.cube)  updatemap(board,testcase);
-    for(int i=0;i<board.cubecnt;i++) updatemap(board, board.cube[i]);
+    for(int i=0;i<board.cubecnt;i++){
+        if( board.cube[i].move == 0 ) updatemap(board, board.cube[i], -3  , true);
+        if(board.cube[i].move!=0){
+            int tmp=updatemap(board, board.cube[i],-3, false);
+            //cout<<board.cube[i].name<<tmp<<endl;
+            updatemap(board, board.cube[i], tmp  , true);
+        }
+    }
     board.showmap();
     
     return 0;
