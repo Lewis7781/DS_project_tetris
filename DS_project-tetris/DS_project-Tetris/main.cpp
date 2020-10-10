@@ -132,9 +132,21 @@ void showcube(gameboard board){
         cout<<"========"<<endl;
     }
 }
+bool checkboundary(block test,int fallingpt){
+    bool velidity=false;
+    for(int i=3;i>=0;i--){
+        for(auto c :test.shape[i]){
+            
+            
+        }
+    }
+    
+    return velidity;
+}
 
 void updatemap(gameboard board,block test){
-//    vector <int> lastline(test.shape[3].begin(), test.shape[3].end()-1);
+   // vector <int> lastline1=test.shape[3];
+   // vector <int> lastline(test.shape[3].begin(), test.shape[3].end()-1);
 //    lastline.assign(test.shape[3].begin(), test.shape[3].end()-1);   //fuck why exceed boundary
     int i=0;     // cube's current position(height) in the gameboard
     bool obstruct=false;
@@ -144,19 +156,26 @@ void updatemap(gameboard board,block test){
         obstruct=false;
         for(auto dot=test.shape[3].begin();dot!=test.shape[3].end();dot++,j++){
             
-            if( *dot==1 ){  // check the dot downward
+            if( *dot==1 ){                        // check the dot downward
                 if(board.map[i][falling_col+j]==1){
                     obstruct=true;
                 }
             }
             
         }
-        if( obstruct==true && test.move!=0){   //to move left or right
-            
+        if( obstruct==true ){      // to move left or right
+            if( test.move != 0 ){
+                
+            }
+            else{
+                bool valid=checkboundary(test,falling_col);
+                
+            }
         }
         i++;
     }
-    cout<<endl;
+    cout<<"ff"<<endl;
+    //cout<<endl;
 }
 int main(int argc, const char * argv[]) {
     int n,m;
@@ -171,7 +190,7 @@ int main(int argc, const char * argv[]) {
     
    // showcube(board);
     
-    for(auto testcase:board.cube)  updatemap(board,testcase);
-    
+    //for(auto testcase:board.cube)  updatemap(board,testcase);
+    for(int i=0;i<board.cubecnt;i++) updatemap(board, board.cube[i]);
     return 0;
 }
